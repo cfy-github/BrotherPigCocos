@@ -78,6 +78,7 @@
 		D7ACB91519E6A8BE0077811F /* fire.png in Resources */ = {isa = PBXBuildFile; fileRef = D7ACB91319E6A8BE0077811F /* fire.png */; };
 		D7ACB91619E6A8BE0077811F /* fireSel.png in Resources */ = {isa = PBXBuildFile; fileRef = D7ACB91419E6A8BE0077811F /* fireSel.png */; };
 		D7ACB91A19E7B2720077811F /* brick.png in Resources */ = {isa = PBXBuildFile; fileRef = D7ACB91919E7B2720077811F /* brick.png */; };
+		D7ACB91C19E7D8890077811F /* arrow.png in Resources */ = {isa = PBXBuildFile; fileRef = D7ACB91B19E7D8890077811F /* arrow.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -182,6 +183,7 @@
 		D7ACB91319E6A8BE0077811F /* fire.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fire.png; sourceTree = "<group>"; };
 		D7ACB91419E6A8BE0077811F /* fireSel.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fireSel.png; sourceTree = "<group>"; };
 		D7ACB91919E7B2720077811F /* brick.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brick.png; sourceTree = "<group>"; };
+		D7ACB91B19E7D8890077811F /* arrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = arrow.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -296,6 +298,7 @@
 		46880B7519C43A67006E1F66 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				D7ACB91B19E7D8890077811F /* arrow.png */,
 				D7ACB91919E7B2720077811F /* brick.png */,
 				D7ACB91319E6A8BE0077811F /* fire.png */,
 				D7ACB91419E6A8BE0077811F /* fireSel.png */,
@@ -518,6 +521,7 @@
 				D7ACB91519E6A8BE0077811F /* fire.png in Resources */,
 				50EF629817ECD46A001EB2F8 /* Icon-80.png in Resources */,
 				5087E78417EB970100C73F5D /* Icon-57.png in Resources */,
+				D7ACB91C19E7D8890077811F /* arrow.png in Resources */,
 				5087E77E17EB970100C73F5D /* Default.png in Resources */,
 				D719218419E4E77700FA2CFD /* wolf_dead.png in Resources */,
 				46880B7B19C43A67006E1F66 /* CloseNormal.png in Resources */,

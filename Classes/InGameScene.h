@@ -18,10 +18,13 @@ private:
     cocos2d::Texture2D *cacheWolfDead;
     cocos2d::Texture2D *cacheWolfRun;
     cocos2d::Texture2D *cacheBallon;
+    cocos2d::Texture2D *cacheArrow;
+    
     //cocos2d::Texture2D *cacheFire;
    // cocos2d::Texture2D *cacheFireSel;
     static const int MaxNumWolfs=20;
     static const int MaxHungryWolvs=4;
+    static const int MaxArrows=3;
     
     struct wolfInfo{
         float x,y;
@@ -38,6 +41,10 @@ private:
     bool holdBrick=false;
     bool brickFired=false;
     float brickDy=0;
+    int numArrows=0;
+    
+    cocos2d::Sprite* pArrows[MaxArrows];
+    
     void genWolf(int k);
     bool cacheImages();
     void updateNewWolf(float t);
@@ -49,7 +56,10 @@ private:
     void attackWolf(cocos2d::Node* node);
     void holdWolf(cocos2d::Node* node);
     void removeWolf(cocos2d::Node * node);
+    void removeArrow(int t);
     void toDeadWolf(int t);
+    
+    void genArrow();
     
     void initTouchEvent();
     

@@ -70,6 +70,13 @@ void InGame::toDeadWolf(int t) {
     wolfs[t].pSprite->runAction(actSeq);
 }
 
+void InGame::removeArrow(int t) {
+    numArrows--;
+    int tag=pArrows[t]->getTag();
+    removeChildByTag(tag, true);
+    pArrows[t]=nullptr;
+}
+
 void InGame::updateGame(float t) {
     auto ps=getChildByTag(610);
     auto from=ps->getPosition();
@@ -84,6 +91,21 @@ void InGame::updateGame(float t) {
     if(getMovingUp()) {
         if(from.y<=visibleSize.height * 0.8 - 3) {
             ps->setPosition(Vec2(from.x, from.y+3));
+        }
+    }
+    
+    //Arrow hit
+    for(int i=0;i<numArrows;++i) {
+        if(pArrows[i]!=nullptr) {
+            for(int j=0;j<MaxNumWolfs;++j) {
+                if(wolfs[j].state==0) {
+                    if(pArrows[i] && wolfs[j].pBallon->getBoundingBox().containsPoint(Point(pArrows[i]->getPosition()))) {
+                        toDeadWolf(j);
+                        removeArrow(i);
+                    }
+                }
+            }
+            if(pArrows[i] && pArrows[i]->getPosition().x<=0) removeArrow(i);
         }
     }
     
@@ -123,8 +145,8 @@ void InGame::updateGame(float t) {
         }
     }
     
-    //falling wolf hits living wolf
     for(int i=0;i<MaxNumWolfs;++i) {
+        //falling wolf hits living wolf
         if(wolfs[i].state==-2) {
             for(int j=0;j<MaxNumWolfs;++j) {
                 if(wolfs[j].state==0) {
@@ -135,7 +157,13 @@ void InGame::updateGame(float t) {
                 }
             }
         }
+        if(wolfs[i].state==2) {
+            if(pPig->getBoundingBox().intersectsRect(wolfs[i].pSprite->getBoundingBox())) {
+                GameOver();
+            }
+        }
     }
+    
 }
 
 void InGame::updateNewWolf(float t) {
@@ -194,11 +222,32 @@ void InGame::holdWolf(Node *node) {
     ps->setTexture(cacheWolfLive);
 }
 
+void InGame::genArrow() {
+    auto pPig=getChildByTag(610);
+    int i;
+    for(i=0;i<MaxArrows;++i) if(pArrows[i]==nullptr) break;
+    numArrows++;
+    
+    auto ps=Sprite::createWithTexture(cacheArrow);
+    ps->setTag(800+i);
+    ps->setAnchorPoint(Vec2::ZERO);
+    ps->setPosition(pPig->getPosition().x-ps->getContentSize().width, pPig->getPosition().y+pPig->getContentSize().height*0.35);
+    addChild(ps);
+    pArrows[i]=ps;
+    
+    auto actMove=MoveBy::create(1.0f, Vec2(-200.0, 0));
+    auto repeat=RepeatForever::create(actMove);
+    ps->runAction(repeat);
+}
+
 void InGame::menuFireCallBack(Ref* pSender){
-    //CCLOG("Fire!\n");
     if(holdBrick) {
         brickFired=true;
         holdBrick=false;
+    } else {
+        if(numArrows<MaxArrows) {
+            genArrow();
+        }
     }
 }
 
@@ -280,6 +329,7 @@ bool InGame::cacheImages() {
     cacheWolfLive=Director::getInstance()->getTextureCache()->addImage("wolf_live.png");
     cacheWolfRun=Director::getInstance()->getTextureCache()->addImage("run_wolf.png");
     cacheBallon=Director::getInstance()->getTextureCache()->addImage("Circle.png");
+    cacheArrow=Director::getInstance()->getTextureCache()->addImage("arrow.png");
     if(cachePigG && cacheWolfDead && cacheWolfLive && cacheWolfRun) return true;
     else return false;
 }
@@ -311,7 +361,6 @@ bool InGame::getMovingUp() {return movingUp;}
 
 
 void InGame::onTouchEnded(Touch* t, Event* e) {
-    CCLOG("Touch ended!\n");
     auto visibleSize=Director::getInstance()->getVisibleSize();
     
     auto tLoc=t->getLocationInView();
@@ -332,7 +381,7 @@ void InGame::onTouchEnded(Touch* t, Event* e) {
 }
 
 bool InGame::onTouchBegan(Touch* t, Event* e) {
-    CCLOG("Touch Began\n");
+    //CCLOG("Touch Began\n");
     auto visibleSize=Director::getInstance()->getVisibleSize();
     auto tLoc=t->getLocationInView();
     tLoc=Director::getInstance()->convertToGL(tLoc);
@@ -340,24 +389,24 @@ bool InGame::onTouchBegan(Touch* t, Event* e) {
     auto psUp=getChildByTag(600); //600 for up button;
     auto psDown=getChildByTag(601); //601 for down button;
     
-    auto bbox=psDown->getBoundingBox();
+    //auto bbox=psDown->getBoundingBox();
     
-    CCLOG("%f,%f,%f,%f\n", bbox.origin.x, bbox.origin.y, bbox.size.width, bbox.size.height);
-    CCLOG("%f, %f\n", tLoc.x, tLoc.y);
+   // CCLOG("%f,%f,%f,%f\n", bbox.origin.x, bbox.origin.y, bbox.size.width, bbox.size.height);
+    //CCLOG("%f, %f\n", tLoc.x, tLoc.y);
 
     
     if(psUp->getBoundingBox().containsPoint(Point(tLoc.x-visibleSize.width+visibleSize.height*0.1,tLoc.y-visibleSize.height*0.1))) {
         setMovingUp(true);
         setMovingDown(false);
         psUp->setColor(Color3B(Color4F(0.6f,0.5f,0.1f,1)));
-        CCLOG("up btn\n");
+        //CCLOG("up btn\n");
     }
     
     if(psDown->getBoundingBox().containsPoint(Point(tLoc.x-visibleSize.width+visibleSize.height*0.1,tLoc.y))) {
         setMovingDown(true);
         setMovingUp(false);
         psDown->setColor(Color3B(Color4F(0.6f,0.5f,0.1f,1)));
-        CCLOG("DOWN BTN\n");
+        //CCLOG("DOWN BTN\n");
     }
     
     return true;
@@ -411,15 +460,15 @@ void InGame::initUpDownButtons() {
     psUp->setContentSize(Size(Vec2(visibleSize.height*0.1, visibleSize.height*0.1)));
     psDown->setContentSize(Size(Vec2(visibleSize.height*0.1, visibleSize.height*0.1)));
     
-    auto bbox=psDown->getBoundingBox();
+    //auto bbox=psDown->getBoundingBox();
     
-    CCLOG("%f,%f,%f,%f\n", bbox.origin.x, bbox.origin.y, bbox.size.width, bbox.size.height);
+   // CCLOG("%f,%f,%f,%f\n", bbox.origin.x, bbox.origin.y, bbox.size.width, bbox.size.height);
 
     
                          
     addChild(psUp, 120);
     addChild(psDown, 120);
-    CCLOG("hERE\n");
+   // CCLOG("hERE\n");
 }
 
 void InGame::initPig() {
@@ -477,6 +526,7 @@ bool InGame::init() {
     numWolfs=0;
     numHungryWolfs=0;
     for(int i=0;i<MaxNumWolfs;++i) wolfs[i].state=-1;
+    for(int i=0;i<MaxArrows;++i) pArrows[i]=nullptr;
     
     
     Size visibleSize = Director::getInstance()->getVisibleSize();
